@@ -3,189 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คชื่อเข้าเรียนด้วยตัวเอง</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <title>ระบบสั่งอาหาร - หนูอยากกินไข่</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         body {
-            font-family: 'Prompt', sans-serif;
+            font-family: 'Kanit', sans-serif;
+            background-color: #f8f9fa;
+            color: #2b2b2b;
+        }
+        .luxury-header {
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
+            color: #f39c12;
+            padding: 30px 0;
+            text-align: center;
+            border-bottom: 5px solid #f1c40f;
+            margin-bottom: 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .shop-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f1c40f;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            color: #2c3e50;
+            border-left: 5px solid #f39c12;
+            padding-left: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .menu-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            background: #fff;
+            height: 100%;
+        }
+        .menu-card:hover {
+            transform: translateY(-5px);
+        }
+        .menu-img {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .price-tag {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .btn-luxury {
+            background-color: #2c3e50;
+            color: #fff;
+            border: 1px solid #f1c40f;
+            transition: all 0.3s;
+        }
+        .btn-luxury:hover {
+            background-color: #f39c12;
+            color: #2c3e50;
+        }
+        .cart-sidebar {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 20px;
+        }
+        /* สำหรับหน้าใบเสร็จ PDF */
+        #receipt-template {
+            padding: 30px;
+            background: #fff;
+            font-family: 'Kanit', sans-serif;
         }
     </style>
 </head>
-<body class="bg-green-50 min-h-screen py-8 px-4">
+<body>
 
-    <div class="max-w-2xl mx-auto">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-green-800 mb-2">Student Self Check-In</h1>
-            <p class="text-green-600">ระบบเช็คชื่อเข้าเรียนด้วยตัวเองสำหรับนักศึกษา</p>
-        </div>
+    <div class="luxury-header">
+        <img src="https://i.pinimg.com/564x/e0/a4/f9/e0a4f9dbf04a0e8aa1fcd812331bc812.jpg" alt="หนูอยากกินไข่" class="shop-logo">
+        <h1 class="fw-bold">ร้านหนูอยากกินไข่</h1>
+        <p class="lead text-muted-50">อาหารหรูหรา รสชาติเลอค่า ราคาสบายกระเป๋า</p>
+    </div>
 
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-green-100">
-            <h2 class="text-xl font-semibold text-green-700 mb-4 flex items-center gap-2">
-                📝 กรอกข้อมูลเพื่อเช็คชื่อ
-            </h2>
-            
-            <form id="checkInForm" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อวิชา</label>
-                        <input type="text" id="subject" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition" placeholder="เช่น เทคโนโลยีสารสนเทศ">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่ออาจารย์ผู้สอน</label>
-                        <input type="text" id="teacher" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition" placeholder="เช่น ดร.สมชาย ใจดี">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัสนักศึกษา</label>
-                        <input type="text" id="studentId" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition" placeholder="เช่น 6401020304">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
-                        <input type="text" id="studentName" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition" placeholder="เช่น นายสมศักดิ์ รักเรียน">
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-8">
+                
+                <div class="card p-4 border-0 shadow-sm mb-4" style="border-radius: 15px;">
+                    <h4 class="fw-bold mb-3 text-secondary"><i class="fa-solid fa-user-plate me-2"></i>ข้อมูลผู้สั่งซื้อ</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">เลือกโต๊ะที่นั่ง</label>
+                            <select id="customerTable" class="form-select form-select-lg">
+                                <option value="" disabled selected>--- กรุณาเลือกโต๊ะ N1-N20 ---</option>
+                                </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ชื่อลูกค้า</label>
+                            <input type="text" id="customerName" class="form-select-lg form-control" placeholder="กรุณากรอกชื่อของคุณ">
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ห้องเรียน / ชั้นเลขที่</label>
-                    <input type="text" id="room" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition" placeholder="เช่น ห้อง 402 ชั้น 4">
+                <h3 class="section-title">หมวดหมู่: เมนูไข่สุดหรู</h3>
+                <div class="row row-cols-1 row-cols-md-2 g-4" id="egg-menu"></div>
+
+                <h3 class="section-title">หมวดหมู่: ข้าวสวยร้อนๆ</h3>
+                <div class="row row-cols-1 row-cols-md-2 g-4" id="rice-menu"></div>
+
+                <h3 class="section-title">หมวดหมู่: เครื่องดื่มดับกระหาย</h3>
+                <div class="row row-cols-1 row-cols-md-2 g-4" id="drink-menu"></div>
+
+            </div>
+
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="cart-sidebar">
+                    <h4 class="fw-bold mb-3 text-center border-bottom pb-2"><i class="fa-solid fa-basket-shopping me-2"></i>ตะกร้าอาหารของคุณ</h4>
+                    <div id="cart-items" class="mb-3" style="max-height: 300px; overflow-y: auto;">
+                        <p class="text-muted text-center py-4">ยังไม่มีรายการอาหารในตะกร้า</p>
+                    </div>
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold m-0">ราคารวมทั้งสิ้น:</h5>
+                            <span class="price-tag fs-3" id="cart-total">0 ฿</span>
+                        </div>
+                        <button class="btn btn-luxury w-100 btn-lg mb-2" id="btn-submit" onclick="submitOrder()">
+                            <i class="fa-solid fa-paper-plane me-2"></i>ส่งรายการสั่งอาหาร
+                        </button>
+                        <button class="btn btn-outline-danger w-100" onclick="clearCart()">ล้างตะกร้า</button>
+                    </div>
                 </div>
-
-                <button type="submit" id="submitBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 flex justify-center items-center gap-2">
-                    <span>📌 บันทึกเวลาเข้าเรียน</span>
-                </button>
-            </form>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-xl p-6 border border-green-100">
-            <h2 class="text-xl font-semibold text-green-700 mb-4 flex items-center gap-2">
-                📋 ประวัติการเช็คชื่อล่าสุด (ในเซสชั่นนี้)
-            </h2>
-            
-            <div id="logsContainer" class="space-y-4">
-                <p id="noDataText" class="text-gray-400 text-center py-6">ยังไม่มีประวัติการเช็คชื่อในขณะนี้</p>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2">
-        <span id="toastIcon"></span>
-        <span id="toastMessage"></span>
+    <div id="receipt-outer" style="display: none;">
+        <div id="receipt-template">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">ใบเสร็จรับเงิน / ใบสั่งอาหาร</h2>
+                <h4>ร้านหนูอยากกินไข่</h4>
+                <p id="receipt-date" class="text-muted m-0"></p>
+                <hr>
+            </div>
+            <div class="mb-3">
+                <p class="m-1"><strong>โต๊ะ:</strong> <span id="r-table"></span></p>
+                <p class="m-1"><strong>ชื่อลูกค้า:</strong> <span id="r-name"></span></p>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="table-dark">
+                        <th>รายการอาหาร</th>
+                        <th class="text-center">จำนวน</th>
+                        <th class="text-end">ราคา</th>
+                    </tr>
+                </thead>
+                <tbody id="receipt-rows"></tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2" class="text-end">รวมทั้งสิ้น</th>
+                        <th class="text-end text-danger" id="receipt-total">0 ฿</th>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="text-center mt-4">
+                <p class="text-muted">~ ขอบคุณที่ใช้บริการ "หนูอยากกินไข่" ค่ะ ~</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 🛑 นำ URL ของ Web App จาก Google Apps Script ที่ได้มาใส่ในช่องนี้ 🛑
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxJTbFqvL0jhLUgE7NQ8NGQe1ilhoeWzq0HWKaehLApJSf4WYAJzafQwMq4Np1w4GOV/exec";
+        // ข้อมูลเมนูอาหารตามโจทย์
+        const menuData = {
+            eggs: [
+                { id: 'e1', name: 'ไข่เจียวหนูสับ', price: 99, img: 'https://assets.unileversolutions.com/recipes-v2/117867.jpg' },
+                { id: 'e2', name: 'ไข่ลูกเขย', price: 139, img: 'https://img.wongnai.com/p/1920x0/2019/03/04/aded542654494b3ba8d8ff1589b4871c.jpg' },
+                { id: 'e3', name: 'ยำไข่ต้ม', price: 599, img: 'https://img.wongnai.com/p/1920x0/2019/03/04/aded542654494b3ba8d8ff1589b4871c.jpg' },
+                { id: 'e4', name: 'ไข่ตุ๋นหนูสับ', price: 99, img: 'https://api2.krua.co/wp-content/uploads/2021/05/RT1309_ImageBanner_1140x507.jpg' },
+                { id: 'e5', name: 'ข้าวผัดไข่', price: 120, img: 'https://www.maggi.co.th/sites/default/files/srh_recipes/a1b6cab9710d963ab0d30f62e5d3a88a.jpeg' }
+            ],
+            rice: [
+                { id: 'r1', name: 'ข้าวเหนียว', price: 99, img: 'https://fit-d.com/image_webp/f?src=./uploads/food/19b66ec416796841107f89fbe9cd26fb.jpg' },
+                { id: 'r2', name: 'ข้าวสวย', price: 99, img: 'https://f.btwcdn.com/store-45801/product/8b1e8e50-f3eb-2b54-58a6-5e294dca5a85.jpg' }
+            ],
+            drinks: [
+                { id: 'd1', name: 'น้ำเปล่า', price: 99, img: 'https://inwfile.com/s-p/7iqm73.jpg' },
+                { id: 'd2', name: 'เบียร์ลีโอ', price: 499, img: 'https://www.raanthai.co.uk/cdn/shop/files/dri424lg.jpg?v=1721496971&width=299' }
+            ]
+        };
 
-        const form = document.getElementById('checkInForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const logsContainer = document.getElementById('logsContainer');
-        const noDataText = document.getElementById('noDataText');
+        let cart = {};
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // เริ่มต้นสร้างหน้าเว็บเมื่อโหลดเสร็จ
+        window.onload = function() {
+            initTableSelect();
+            renderMenu('egg-menu', menuData.eggs);
+            renderMenu('rice-menu', menuData.rice);
+            renderMenu('drink-menu', menuData.drinks);
+        };
 
-            // เช็คว่ากรอก URL หรือยัง
-            if(WEB_APP_URL.includes("ใส่_URL_APPS_SCRIPT")) {
-                showToast("❌ กรุณาใส่ URL Apps Script ในโค้ดก่อนใช้งาน!", "error");
+        // สร้างตัวเลือกโต๊ะ N1-N20
+        function initTableSelect() {
+            const select = document.getElementById('customerTable');
+            for(let i=1; i<=20; i++) {
+                let opt = document.createElement('option');
+                opt.value = `N${i}`;
+                opt.textContent = `โต๊ะ N${i}`;
+                select.appendChild(opt);
+            }
+        }
+
+        // แสดงผลรายการอาหารบนหน้าเว็บ
+        function renderMenu(elementId, items) {
+            const container = document.getElementById(elementId);
+            items.forEach(item => {
+                container.innerHTML += `
+                    <div class="col">
+                        <div class="menu-card">
+                            <img src="${item.img}" class="menu-img" alt="${item.name}" onerror="this.src='https://placehold.co/400x300?text=No+Image'">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <h5 class="card-title fw-bold">${item.name}</h5>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="price-tag">${item.price} บาท</span>
+                                    <button class="btn btn-luxury btn-sm" onclick="addToCart('${item.id}', '${item.name}', ${item.price})">
+                                        <i class="fa-solid fa-plus me-1"></i>เพิ่มใส่ตะกร้า
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // เพิ่มของใส่ตะกร้า
+        function addToCart(id, name, price) {
+            if (cart[id]) {
+                cart[id].qty += 1;
+            } else {
+                cart[id] = { name: name, price: price, qty: 1 };
+            }
+            updateCartUI();
+        }
+
+        // ลดของออกจากตะกร้า
+        function decreaseQty(id) {
+            if (cart[id]) {
+                cart[id].qty -= 1;
+                if (cart[id].qty <= 0) delete cart[id];
+            }
+            updateCartUI();
+        }
+
+        // อัปเดตการแสดงผลตะกร้าสินค้า
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            container.innerHTML = '';
+            
+            let total = 0;
+            let keys = Object.keys(cart);
+
+            if (keys.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-4">ยังไม่มีรายการอาหารในตะกร้า</p>';
+                totalEl.textContent = '0 ฿';
                 return;
             }
 
-            // เปลี่ยนสถานะปุ่มโหลด
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>กำลังบันทึกข้อมูล...</span>
-            `;
+            keys.forEach(key => {
+                let item = cart[key];
+                let itemTotal = item.price * item.qty;
+                total += itemTotal;
 
-            // ดึงค่าจากฟอร์ม
-            const formData = {
-                subject: document.getElementById('subject').value,
-                teacher: document.getElementById('teacher').value,
-                studentId: document.getElementById('studentId').value,
-                studentName: document.getElementById('studentName').value,
-                room: document.getElementById('room').value
-            };
+                container.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                        <div>
+                            <span class="fw-bold">${item.name}</span><br>
+                            <small class="text-muted">${item.price} ฿ x ${item.qty}</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="decreaseQty('${key}')">-</button>
+                            <span class="mx-2 fw-bold">${item.qty}</span>
+                            <button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="addToCart('${key}', '${item.name}', ${item.price})">+</button>
+                            <span class="ms-3 text-end fw-bold" style="width: 60px;">${itemTotal} ฿</span>
+                        </div>
+                    </div>
+                `;
+            });
 
-            try {
-                // ส่งข้อมูลไปยัง Google Apps Script
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // จำเป็นสำหรับการข้ามโดเมนของ Apps Script แบบง่าย
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-
-                // เนื่องจากโหมด no-cors จะไม่คืนค่า Json กลับมาตรงๆ หน้าเว็บจะจำลองข้อมูลเพื่อแสดงเป็น Log ทันที
-                const autoTimestamp = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-                
-                // แสดงผลลัพธ์ลงในการ์ดสรุปด้านล่าง
-                addLogToSummary(formData, autoTimestamp);
-                showToast("✅ เช็คชื่อเข้าเรียนสำเร็จ!", "success");
-                
-                // ล้างค่าฟอร์มในส่วนของนักศึกษา (ส่วนวิชาค้างไว้เพื่อความสะดวกกรณีเรียนวิชาเดิม)
-                document.getElementById('studentId').value = '';
-                document.getElementById('studentName').value = '';
-
-            } catch (error) {
-                console.error(error);
-                showToast("❌ เกิดข้อผิดพลาดในการส่งข้อมูล", "error");
-            } finally {
-                // คืนค่าปุ่มเดิม
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>📌 บันทึกเวลาเข้าเรียน</span>`;
-            }
-        });
-
-        // ฟังก์ชันสร้างการ์ดแสดงผลลัพธ์
-        function addLogToSummary(data, timestamp) {
-            if (noDataText) noDataText.remove();
-
-            const logCard = document.createElement('div');
-            logCard.className = "bg-green-50/70 border border-green-200 rounded-xl p-4 shadow-sm transition-all hover:shadow-md relative overflow-hidden";
-            logCard.innerHTML = `
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-green-500"></div>
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs bg-green-200 text-green-800 font-medium px-2 py-1 rounded-md">${timestamp}</span>
-                    <span class="text-sm font-semibold text-green-700">${data.room}</span>
-                </div>
-                <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3">
-                    <div><span class="text-gray-500">วิชา:</span> <span class="font-medium text-gray-800">${data.subject}</span></div>
-                    <div><span class="text-gray-500">อาจารย์:</span> <span class="font-medium text-gray-800">${data.teacher}</span></div>
-                    <div><span class="text-gray-500">รหัสนักศึกษา:</span> <span class="font-medium text-gray-800">${data.studentId}</span></div>
-                    <div><span class="text-gray-500">ชื่อ-สกุล:</span> <span class="font-medium text-gray-800">${data.studentName}</span></div>
-                </div>
-            `;
-            
-            // นำ Log ใหม่ขึ้นไปแสดงด้านบนสุดของรายการ
-            logsContainer.insertBefore(logCard, logsContainer.firstChild);
+            totalEl.textContent = total + ' ฿';
         }
 
-        // ฟังก์ชัน Toast สำหรับแจ้งเตือนแบบสวยงาม
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
+        function clearCart() {
+            cart = {};
+            updateCartUI();
+        }
 
-            toastMessage.textContent = message;
-            
-            if(type === 'success') {
-                toast.className = "fixed bottom-5 right-5 bg-green-600 text-white px-6 py-3 rounded-xl shadow-2xl transform opacity-100 transition-all duration-300 flex items-center gap-2 translate-y-0";
-            } else {
-                toast.className = "fixed bottom-5 right-5 bg-red-600 text-white px-6 py-3 rounded-xl shadow-2xl transform opacity-100 transition-all duration-300 flex items-center gap-2 translate-y-0";
+        // ส่งออเดอร์ไปยัง Google Apps Script และ ออก PDF
+        function submitOrder() {
+            const table = document.getElementById('customerTable').value;
+            const name = document.getElementById('customerName').value.trim();
+            const keys = Object.keys(cart);
+
+            if (!table || !name) {
+                alert('กรุณากรอกข้อมูลชื่อลูกค้าและเลือกโต๊ะก่อนสั่งอาหารค่ะ!');
+                return;
+            }
+            if (keys.length === 0) {
+                alert('กรุณาเลือกเมนูอาหารใส่ตะกร้าอย่างน้อย 1 รายการค่ะ!');
+                return;
             }
 
-            setTimeout(() => {
-                toast.className = "fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2";
-            }, 3000);
+            // แสดงสถานะกำลังบันทึก
+            const submitBtn = document.getElementById('btn-submit');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังบันทึกข้อมูล...`;
+
+            // เตรียมข้อมูลส่งไปยัง Apps Script
+            let orderDetails = keys.map(key => `${cart[key].name} (${cart[key].qty} จาน)`).join(', ');
+            let totalPrice = keys.reduce((sum, key) => sum + (cart[key].price * cart[key].qty), 0);
+
+            let payload = {
+                table: table,
+                name: name,
+                details: orderDetails,
+                total: totalPrice,
+                rawCart: cart // ส่งก้อนวัตถุเต็มไปจัดการจัดหน้าชีตย่อย
+            };
+
+            // ส่วนเรียกเชื่อมต่อเว็บแอปพลิเคชัน Google Apps Script (ใส่ URL เว็บแอปของคุณที่นี่)
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwZc-KWLTQd1zC-KYMeNDeNOi451F7Pq9bSWzasilCQVzk3PLwjFEn-dSdR3mfqiNqC0g/exec"; 
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // บังคับไม่เปิด CORS สำหรับการบันทึกข้ามโดเมนอย่างง่าย
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert('สั่งอาหารสำเร็จ! ระบบกำลังสร้างใบเสร็จให้คุณดาวน์โหลดสักครู่...');
+                generatePDF(table, name, totalPrice);
+                clearCart();
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerTable').value = '';
+            })
+            .catch(err => {
+                console.error(err);
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets แต่ระบบจะดำเนินการออกใบเสร็จ PDF ให้คุณทันที');
+                generatePDF(table, name, totalPrice);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane me-2"></i>ส่งรายการสั่งอาหาร`;
+            });
+        }
+
+        // ฟังก์ชันออกใบเสร็จเป็น PDF อัตโนมัติด้วย html2pdf.js
+        function generatePDF(table, name, total) {
+            document.getElementById('r-table').textContent = table;
+            document.getElementById('r-name').textContent = name;
+            document.getElementById('receipt-date').textContent = "วันที่สั่งซื้อ: " + new Date().toLocaleString('th-TH');
+            
+            const rowsContainer = document.getElementById('receipt-rows');
+            rowsContainer.innerHTML = '';
+            
+            Object.keys(cart).forEach(key => {
+                let item = cart[key];
+                rowsContainer.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td class="text-center">${item.qty}</td>
+                        <td class="text-end">${item.price * item.qty} ฿</td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('receipt-total').textContent = total + ' ฿';
+            
+            // สั่ง Render PDF ใน Background และดาวน์โหลดลงเครื่องลูกค้าทันที
+            const element = document.getElementById('receipt-template');
+            const opt = {
+                margin:       10,
+                filename:     `Receipt_${table}_${name}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            document.getElementById('receipt-outer').style.display = 'block';
+            html2pdf().set(opt).from(element).save().then(()=>{
+                document.getElementById('receipt-outer').style.display = 'none';
+            });
         }
     </script>
 </body>
